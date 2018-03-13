@@ -7,7 +7,7 @@
 
 #include "RandomUtilities.h"
 #include "ContainerPrinting.h"
-#include "unixTimer.h"//CHANGE: this to unixTimer.h if on mac/linux
+#include "winTimer.h"//CHANGE: this to unixTimer.h if on mac/linux
 #include <list>
 #include <iostream>
 #include <vector>
