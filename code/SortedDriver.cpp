@@ -1,34 +1,33 @@
-// SortedDriver.cpp
+//SortedDriver.cpp
+//Sasha Stramel
+//2018 March 25
 
-// tom bailey   1445  25 mar 2014
-// Construct sorted sequences and call functions that
-//   process the sorted sequences.
-
-
-#include "RandomUtilities.h"
-#include "ContainerPrinting.h"
-#include "winTimer.h"//CHANGE: this to unixTimer.h if on mac/linux
+#include "RandomUtilities.hpp"
+#include "ContainerPrinting.hpp"
+#include "unixTimer.h"
 #include <list>
 #include <iostream>
 #include <vector>
-#include <algorithm>
+//#include <algorithm>
+
 
 using namespace std;
+
 
 // post: a sorted vector of listSize random doubles from
 //         the range minNum to maxNum has been returned.
 vector<double>
 getNums(size_t listSize, double minNum, double maxNum)
 {
-	vector<double> theList;
-	for (size_t i = 0; i < listSize; ++i)
-	{
-		theList.push_back(randReal(minNum, maxNum));
-	}
-
-	sort(begin(theList), end(theList));
-
-	return theList;
+    vector<double> theList;
+    for (size_t i = 0; i < listSize; ++i)
+    {
+        theList.push_back(randReal(minNum, maxNum));
+    }
+    
+    sort(begin(theList), end(theList));
+    
+    return theList;
 }
 
 
@@ -38,20 +37,20 @@ getNums(size_t listSize, double minNum, double maxNum)
 list<string>
 getWords(size_t numWords, size_t wordLength, string alphabet)
 {
-	list<string> theWords;
-	for (size_t i = 0; i < numWords; ++i)
-	{
-		string word;
-		for (size_t j = 0; j < wordLength; ++j)
-		{
-			word += alphabet.at(randInt(0, alphabet.size()));
-		}
-		theWords.push_back(word);
-	}
-
-	theWords.sort();
-
-	return theWords;
+    list<string> theWords;
+    for (size_t i = 0; i < numWords; ++i)
+    {
+        string word;
+        for (size_t j = 0; j < wordLength; ++j)
+        {
+            word += alphabet.at(randInt(0, alphabet.size()));
+        }
+        theWords.push_back(word);
+    }
+    
+    theWords.sort();
+    
+    return theWords;
 }
 
 
@@ -61,8 +60,50 @@ getWords(size_t numWords, size_t wordLength, string alphabet)
 double
 mostIsolated(vector<double> & number)
 {
-	// STUB  STUB  STUB
-	return -123.456;
+    double iso = 0.0;
+    double left = 0;
+    double right = 0;
+    double diff = 0.00001;
+    double closest = 0;
+    int size = number.size();
+    for (int i = 0; i <size; i++)
+    {
+        double numi = number[i];
+        
+        if (i > 0 && i != (size - 1))
+        {
+            double numip = number[i + 1];
+            double numim = number[i - 1];
+            
+            left = numi - numim;
+            right = numip - numi;
+            
+            if (left > right)
+            {
+                diff = right;
+            }
+            else
+            {
+                diff = left;
+            }
+        }
+        else if (i == 0)
+        {
+            diff = (number[i+1]) - numi;
+        }
+        
+        else if (i == (size - 1))
+        {
+            diff = numi - (number[i - 1]);
+        }
+        
+        if (diff > closest)
+        {
+            closest = diff;
+            iso = numi;
+        }
+    }
+    return iso;
 }
 
 
@@ -72,99 +113,116 @@ mostIsolated(vector<double> & number)
 int
 unmatched(list<string> & A, list<string> & B)
 {
-	// STUB  STUB  STUB
-	return -1;
+    int same = 0;
+    B.unique();
+    std::list<string>::iterator itA = A.begin();
+    std::list<string>::iterator itB = B.begin();
+    while (itA!= A.end() && itB!= B.end())
+    {
+        if (*itA == *itB)
+        {
+            same++;
+            itA++;
+        }
+        else if (*itA > *itB)
+        {
+            itB++;
+        }
+        else if (*itA < *itB)
+        {
+            itA++;
+        }
+    }
+    return (A.size() - same);
 }
 
 
 int
 main()
 {
-	cout << "Find the most isolated number" << endl
-		<< "-----------------------------" << endl << endl;
-	while (true)
-	{
-		cout << "Enter size for numbers: ";
-		int n = 0;
-		cin >> n;
-		if (n <= 0)
-			break;
-		cout << "Enter seed for rand: ";
-		unsigned int seed;
-		cin >> seed;
-		srand(seed);
-
-		// Construct a sorted list of numbers
-		Timer get;
-		get.start();
-		vector<double> numbers = getNums(n, -n, n);
-		get.stop();
-		cout << "Constructed in " << get() << " seconds"
-			<< endl;
-
-		if (n < 10)
-			cout << numbers << endl << endl;
-
-		// Report a most isolated isolated number
-		Timer time;
-		time.start();
-		double isolated = mostIsolated(numbers);
-		time.stop();
-		cout << "The most isolated number is "
-			<< isolated << endl
-			<< "calculated in " << time() << " seconds"
-			<< endl << endl;
-	}
-
-
-	cout << endl << endl;
-	cout << "Count the unmatched words" << endl
-		<< "-------------------------" << endl << endl;
-	while (true)
-	{
-		cout << "Enter size for words lists: ";
-		int n = 0;
-		cin >> n;
-		if (n <= 0)
-			break;
-		cout << "Enter word length: ";
-		int wordSize;
-		cin >> wordSize;
-		cout << "Enter alphabet: ";
-		string alphabet;
-		cin >> alphabet;
-
-		cout << "Enter seed for rand: ";
-		unsigned int seed;
-		cin >> seed;
-		srand(seed);
-
-		// Construct two sorted vectors of words
-		Timer get;
-		get.start();
-		list<string> A = getWords(n, wordSize, alphabet);
-		list<string> B = getWords(n, wordSize, alphabet);
-		get.stop();
-		cout << "Constructed in " << get() << " seconds"
-			<< endl;
-
-		if (wordSize * n < 60)
-		{
-			cout << "A is: " << A << endl
-				<< "B is: " << B << endl;
-		}
-
-		// Report the number of words in the first sorted list
-		//   that are not in the second sorted list
-		Timer time;
-		time.start();
-		int count = unmatched(A, B);
-		time.stop();
-		cout << count
-			<< " words in A were not in B" << endl
-			<< "calculated in " << time() << " seconds"
-			<< endl << endl;
-	}
-
-	return 0;
+    cout << "Find the most isolated number" << endl
+    while (true)
+    {
+        cout << "Enter size for numbers: ";
+        int n = 0;
+        cin >> n;
+        if (n <= 0)
+            break;
+        cout << "Enter seed for rand: ";
+        unsigned int seed;
+        cin >> seed;
+        srand(seed);
+        
+        // Construct a sorted list of numbers
+        Timer get;
+        get.start();
+        vector<double> numbers = getNums(n, -n, n);
+        get.stop();
+        cout << "Constructed in " << get() << " seconds"
+        << endl;
+        
+        if (n < 10)
+            cout << numbers << endl << endl;
+        
+        // Report a most isolated isolated number
+        Timer time;
+        time.start();
+        double isolated = mostIsolated(numbers);
+        time.stop();
+        cout << "The most isolated number is "
+        << isolated << endl
+        << "calculated in " << time() << " seconds"
+        << endl << endl;
+    }
+    
+    
+    cout << endl << endl;
+    cout << "Count the unmatched words" << endl
+    while (true)
+    {
+        cout << "Enter size for words lists: ";
+        int n = 0;
+        cin >> n;
+        if (n <= 0)
+            break;
+        cout << "Enter word length: ";
+        int wordSize;
+        cin >> wordSize;
+        cout << "Enter alphabet: ";
+        string alphabet;
+        cin >> alphabet;
+        
+        cout << "Enter seed for rand: ";
+        unsigned int seed;
+        cin >> seed;
+        srand(seed);
+        
+        // Construct two sorted vectors of words
+        Timer get;
+        get.start();
+        list<string> A = getWords(n, wordSize, alphabet);
+        list<string> B = getWords(n, wordSize, alphabet);
+        get.stop();
+        cout << "Constructed in " << get() << " seconds"
+        << endl;
+        
+        if (wordSize * n < 60)
+        {
+            cout << "A is: " << A << endl
+            << "B is: " << B << endl;
+        }
+        
+        // Report the number of words in the first sorted list
+        //   that are not in the second sorted list
+        Timer time;
+        time.start();
+        int count = unmatched(A, B);
+        time.stop();
+        cout << count
+        << " words in A were not in B" << endl
+        << "calculated in " << time() << " seconds"
+        << endl << endl;
+    }
+    
+    return 0;
 }
